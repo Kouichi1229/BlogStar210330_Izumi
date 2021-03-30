@@ -1,0 +1,98 @@
+{% extends './base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="jumbotron">
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-6">
+				<h1><strong>Izumi</strong>のページ</h1>
+				<p class="lead">V-tuberプログラマーのポートフォリオ公開中。</p>
+			</div>
+			<div class="col-sm-6">
+				<img src="/static/img/Izumi_photo2.png" height="480px" alt="izumisyasinn">
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="starter-template">
+		<div class="row text-center">
+			<h2 style="font-family: 'Yusei Magic'; font-size: 260%;">見かけによらず、個性的でチャーミング！！</h2>
+			<div class="col-sm-4">
+				<h2 class="color-talk"><i class="bi bi-chat-left-text icon-size" ></i><br>しゃべる</h2>
+				<p>コミュニケーション能力が高く、<br>中国語と日本語と英語<br>が話せる。</p>
+			</div>
+			<div class="col-sm-4">
+				<h2 class="color-wrench"><span class="bi bi-wrench icon-size"></span><br>つくる</h2>
+				<p>学生時代に自分でC#でPost　SystemとLineのChatBotを作た、<br>就業までにpythonで写真の分類をした、<br>今様々開発経験を積んでいる。</p>
+			</div>
+			<div class="col-sm-4">
+				<h2 class="color-heart"><span class="bi bi-hand-thumbs-up-fill icon-size"></span><br>たよる</h2>
+				<p>チームに仕事を割り当てで、<br>指揮ことを担当する。<br>相談と安心のキャラです。</p>
+			</div>
+		</div>
+		<hr>
+		<h2 style="font-size:35px;">Side Projects</h2>
+		<div class="row">
+			<div class="col-sm-6">
+				<h3>Order System</h3>
+				<p>初プロジェト、操作が易い使う、基本的な飲み物の注文システム。管理登録やメニュー編集やトータルレポートの機能があります。</p>
+				<img src="/static/img/system.jpg" style="float:right;width:500px;height:500px;" >
+			</div>
+			<div class="col-sm-6">
+				<img src="/static/img/orders-login.PNG" style="float:left;width:500px;height:550px;"  >
+
+			</div>
+		</div>
+		<p></p>
+		<div class="row">
+			<div class="col-sm-6">
+				<h3>健康相談 - 健康向け相談Line bot</h3>
+				<p>今の社会忙しくて、ストレスいっぱくて、色々文明病気出た。もし、病院へいかない時間はこの相談ボットは参考ができが、あとは必ず病院へ行って検査しなければいけません。このデータベースはいっぱい病院の病気の資料を収集したと整理した。食べ物のカロリーも検索ができる。Lineで知りたい情報が易い手に入る。</p>
+			</div>
+			<div class="col-sm-6">
+				<img src="/static/img/health-v.jpg" style="float:left;width:500px;" alt="health-app-img" >
+			</div>
+		</div>
+		<p></p>
+		<div class="row">
+			<div class="col-sm-6">
+				<h3>害蟲区別</h3>
+				<p>2019から台湾の畑にツマジロクサヨトウを発見した。ですが、色々虫とツマジロクサヨトウとても似ている、農夫は判断が難しい。その問題ために台湾に見られる虫とツマジロクサヨトウの写真を収集して、深層学習のモデルで分析した。</p>
+			</div>
+			<div class="col-sm-6">
+				<img src="/static/img/python-bug-cnn.jpg"　 style="float:left;width:500px;" alt="python-bug-cnn-img" >
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<h3>Others</h3>
+				<ul>
+					<li><a href="https://github.com/Kouichi1229"><i class="bi bi-github"></i></li></a>
+				</ul>
+			</div>
+		</div>
+		<hr>
+		<h2 id="skills">Skills</h2>
+		<div class="row">
+			<div class="col-sm-12">
+				<h3>Programing Language</h3>
+				<ul>
+					<li>Python <b>作品:害蟲区別(TensorFlow API)、このBlog(Django)</b></li>
+					<li>C＃ <b>作品:Order System、健康相談(Net.C# + Azure)</b></li>
+					<li>JAVA</li>
+				</ul>
+
+				<h3>Database</h3>
+				<ul>
+					<li>Mysql</li>
+				</ul>
+			</div>
+		</div>
+		<a class="btn btn-outline-secondary" href="#" style="float: right;">Topに戻る</a>
+		<p></p>
+	</div>
+</div>
+{% endblock %}
