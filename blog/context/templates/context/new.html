@@ -1,0 +1,13 @@
+{% extends './base.html' %}
+{% load staticfiles %}
+{% block content %}
+<h2>{{ message }}</h2>
+<form method="POST">
+	{% csrf_token %}
+	{{form}}
+	
+</form>
+<button type='submit' class='btn btn-outline-primary'>作成する</button>
+<a href='{% url "blog:index" %}' class='btn btn-outline-secondary'>戻る</a>
+
+{% endblock %}
