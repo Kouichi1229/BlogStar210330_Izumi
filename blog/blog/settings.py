@@ -111,6 +111,24 @@ LOGIN_REDIRECT_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+# if DB_SELECTED == 'postgresql':
+#     DB_ENGINE = 'django.db.backends.postgresql_psycopg2'
+#     DB_PORT = '5432'
+#     DB_OPTIONS = {}
+
+#     if IS_HEROKU_SUPPORTED:
+#         DB_NAME = '<heroku name>'
+#         DB_USER = '<heroku user>'
+#         DB_PASSWORD = '<heroku password>'
+#         DB_HOST = '<heroku host>'
+#     else:
+#         DB_NAME = 'db.postgresql_psycopg2'
+#         DB_USER = 'nsuhara'
+#         DB_PASSWORD = 'nsuhara'
+#         DB_HOST = '127.0.0.1'
+
+#     DB_URI = 'postgresql://{}:{}@{}/{}'.format(DB_USER,
+#                                                DB_PASSWORD, DB_HOST, DB_NAME)
 
 DATABASES = {
     'default': {
@@ -124,6 +142,11 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
+db_form_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_form_env)
+
+
 
 
 # Password validation
