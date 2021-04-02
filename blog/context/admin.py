@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Blog_Posts
+from .models import *
 from tinymce.widgets import TinyMCE
 
 class TutorialAdmin(admin.ModelAdmin):
