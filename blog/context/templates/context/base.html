@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>    
+<head>        
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>        
+  <title>Izumi Blog</title>
+  <!-- css -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- bootstrap  -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
+  <!--Chat.js-->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js'></script>
+  <!--js-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+  <!-- icon  -->
+  <link rel="icon" href="/static/img/New Piskel-1.png.ico"  type="image/x-icon">   
+  <!-- Text/Typography  -->
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi&family=Kosugi+Maru&family=Shippori+Mincho+B1:wght@700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">   
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Potta+One&family=Yusei+Magic&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Potta+One&family=Stick&family=Yusei+Magic&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500&display=swap" rel="stylesh">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 50px;
+    }
+
+    .icon-size {
+      font-size: 200%;
+    }
+
+    h1 {
+      font-family: 'Kosugi', sans-serif;
+    }
+
+    p{
+      font-family: 'Kosugi Maru', sans-serif;
+    }
+
+    .starter-template {
+      padding: 40px 80px;
+      background-color: white;
+    }
+
+    .icon-size {
+      font-size: 200%;
+    }
+    .color-talk {
+      color: lightseagreen;
+    }
+
+    .color-wrench {
+      color: steelblue;
+    }
+
+    .color-heart {
+      color: plum;
+    }
+
+    .bar {
+      margin-bottom: 10px;
+      width: 0;
+      padding: 5px 10px;
+    }
+
+    #Nav_font{
+      font-family:'Potta One', cursive;
+    }
+
+    #logo {
+      overflow: hidden;
+      height: 250px;
+    }
+
+    #page {
+      overflow: hidden;
+      padding: 20px 20px 40px 20px;
+    }
+
+
+
+  </style>   
+</head>    
+<body>        
+ <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+   <a class="navbar-brand" href="{% url 'blog:index' %}">
+    <img src="/static/img/New Piskel-1.png.ico" alt="logo" style="width:40px;">
+  </a>
+  <a class="navbar-brand" href="{% url 'blog:index' %}" id="Nav_font">Izumiの家</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class='navbar-brand' href="{% url 'blog:list'%}" id="Nav_font">IT勉強帳</a>
+      </li>
+      <li class="nav-item">
+        <a class='navbar-brand' href="{% url 'blog:aboutme' %}" id="Nav_font" >About Me</a>
+      </li>
+      {% if user.is_authenticated %}
+      <li class='nav-time'>
+        <span class='navbar-text'>{{ user }} - </span>
+      </li>
+      <li class='nav-item'>
+        <a href='{% url "logout" %}' class='logout nav-link'>Logout</a>
+      </li>
+      {% else %}
+      <a href='{% url "login" %}' class='login nav-link'>Login</a>
+      {% endif %}    
+    </ul>
+  </div>  
+</nav>
+<br>
+<div class='container'>            
+  {% block content %}            
+  {% endblock %}        
+</div>
+<!-- footer -->   
+<div>
+  <div class="jumbotron" >
+    <div class="row">
+      <div class="col-sm-6">
+        <p><a href="{% url 'blog:index' %}">Izumiの家</a> | 
+          <a href="{% url 'blog:list'%}">IT勉強帳</a> | 
+          <a href="{% url 'blog:aboutme' %}">About Me</a></p>
+        <p></p>
+        <p>Copyright © 2021 Izumi. All rights reserved.</p>
+        <p>版權所有© 2021 Izumi</p>
+      </div>
+      <div class="col-sm-6">
+        <a href="https://github.com/Kouichi1229"><i class="bi bi-github"></i></a>
+        <a href="https://twitter.com/home"><i class="bi bi-twitter"></i></a>
+        <a href="https://www.youtube.com/"><i class="bi bi-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+</div> 
+<!-- jQuery and JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-LCPyFKQyML7mqtS+4XytolfqyqSlcbB3bvDuH9vX2sdQMxRonb/M3b9EmhCNNNrV" crossorigin="anonymous"></script>
+</body>
+</html>
