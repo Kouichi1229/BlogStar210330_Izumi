@@ -113,7 +113,7 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 LOGIN_REDIRECT_URL = '/'
 
 # django-crispy-forms 設定
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+# CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
