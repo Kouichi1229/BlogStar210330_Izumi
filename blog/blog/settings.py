@@ -14,6 +14,10 @@ import os
 import django_heroku
 import dj_database_url
 from decouple import config
+from socket import gethostname
+
+
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -71,6 +75,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'bootstrap4',
     'tinymce',
 ]
@@ -108,6 +113,8 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 
 LOGIN_REDIRECT_URL = '/'
 
+# django-crispy-forms 設定
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -130,23 +137,43 @@ LOGIN_REDIRECT_URL = '/'
 #     DB_URI = 'postgresql://{}:{}@{}/{}'.format(DB_USER,
 #                                                DB_PASSWORD, DB_HOST, DB_NAME)
 
-DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'ENGINE': 'django.db.backends.mysql',        
-        'NAME': 'blogdb',        
-        'USER': 'root',        
-        'PASSWORD': '',        
-        'HOST': '127.0.0.1',        
-        'PORT': '3306',
+# DATABASES = {
+#     'default': {
+#         # 'ENGINE': 'django.db.backends.sqlite3',
+#         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#         'ENGINE': 'django.db.backends.mysql',        
+#         'NAME': 'blogdb',        
+#         'USER': 'root',        
+#         'PASSWORD': '',        
+#         'HOST': '127.0.0.1',        
+#         'PORT': '3306',
+#     }
+# }
+
+# db_form_env = dj_database_url.config(conn_max_age=600)
+# DATABASES['default'].update(db_form_env)
+
+# hostnameが自分のpcの場合は、sqliteに接続する
+# そうでない場合はherokuのpostgresに接続する
+
+hostname = gethostname()
+if "blogdb" in hostname:
+    DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.sqlite3',
+           'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+       }
     }
-}
-
-db_form_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_form_env)
-
-
+    ALLOWED_HOSTS = ['*']
+else:
+    # 本番環境ではデバッグモードはfalseにしておく
+    DEBUG = False
+    #import dj_database_url
+    db_from_env = dj_database_url.config()
+    DATABASES = {
+        'default': dj_database_url.config()
+    }
+    ALLOWED_HOSTS = ['*']
 
 
 # Password validation
