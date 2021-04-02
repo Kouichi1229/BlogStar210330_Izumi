@@ -14,7 +14,7 @@ import os
 import django_heroku
 import dj_database_url
 from decouple import config
-from socket import gethostname
+# from socket import gethostname
 
 
 
@@ -136,18 +136,18 @@ LOGIN_REDIRECT_URL = '/'
 #     DB_URI = 'postgresql://{}:{}@{}/{}'.format(DB_USER,
 #                                                DB_PASSWORD, DB_HOST, DB_NAME)
 
-# DATABASES = {
-#     'default': {
-#         # 'ENGINE': 'django.db.backends.sqlite3',
-#         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#         'ENGINE': 'django.db.backends.mysql',        
-#         'NAME': 'blogdb',        
-#         'USER': 'root',        
-#         'PASSWORD': '',        
-#         'HOST': '127.0.0.1',        
-#         'PORT': '3306',
-#     }
-# }
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',        
+        'NAME': 'blogdb',        
+        'USER': 'root',        
+        'PASSWORD': '',        
+        'HOST': '127.0.0.1',        
+        'PORT': '3306',
+    }
+}
 
 # db_form_env = dj_database_url.config(conn_max_age=600)
 # DATABASES['default'].update(db_form_env)
@@ -155,24 +155,24 @@ LOGIN_REDIRECT_URL = '/'
 # hostnameが自分のpcの場合は、sqliteに接続する
 # そうでない場合はherokuのpostgresに接続する
 
-hostname = gethostname()
-if "blogdb" in hostname:
-    DATABASES = {
-       'default': {
-           'ENGINE': 'django.db.backends.sqlite3',
-           'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-       }
-    }
-    ALLOWED_HOSTS = ['*']
-else:
-    # 本番環境ではデバッグモードはfalseにしておく
-    DEBUG = False
-    #import dj_database_url
-    db_from_env = dj_database_url.config()
-    DATABASES = {
-        'default': dj_database_url.config()
-    }
-    ALLOWED_HOSTS = ['*']
+# hostname = gethostname()
+# if "blogdb" in hostname:
+#     DATABASES = {
+#        'default': {
+#            'ENGINE': 'django.db.backends.sqlite3',
+#            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#        }
+#     }
+#     ALLOWED_HOSTS = ['*']
+# else:
+#     # 本番環境ではデバッグモードはfalseにしておく
+#     DEBUG = False
+#     #import dj_database_url
+#     db_from_env = dj_database_url.config()
+#     DATABASES = {
+#         'default': dj_database_url.config()
+#     }
+#     ALLOWED_HOSTS = ['*']
 
 
 # Password validation
