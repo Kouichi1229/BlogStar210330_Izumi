@@ -41,7 +41,7 @@ def delete(request, id):
 
 def edit(request, id):
     blog_posts = get_object_or_404(Blog_Posts, pk=id)
-    blogEditForm = BlogEditForm(instance=article)
+    blogEditForm = BlogEditForm(instance=blog_posts)
 
     context = {
         'message': 'Edit Article',
