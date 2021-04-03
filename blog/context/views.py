@@ -44,7 +44,7 @@ def edit(request, id):
     blogEditForm = BlogEditForm(instance=blog_posts)
 
     context = {
-        'message': 'Edit Article',
+        'message': blog_posts.title,
         'blog_posts': blog_posts,
         'blogEditForm': blogEditForm,
     }

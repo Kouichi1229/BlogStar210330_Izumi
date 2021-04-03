@@ -7,7 +7,8 @@
     <form action='{% url "blog:update" blog_post.id %}' method='post' class='form'>
         {% csrf_token %}
         {% bootstrap_form blogEditForm layout='horizontal' %}
+        <br>
         <button type='submit' class='btn btn-outline-primary'>保存する</button>
-        <a href='{% url "blog:detail" blog_post.id %}' class='btn btn-outline-secondary'>戻る</a>
+        <a href='{% url "blog:list" %}' class='btn btn-outline-secondary'>戻る</a>
     </form>
 {% endblock %}
