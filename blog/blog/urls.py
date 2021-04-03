@@ -24,6 +24,6 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/context/')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('tinymce/',include('tinymce.urls')),
-
+    #path('ueditor/', include('DjangoUeditor.urls')),
 ]
 urlpatterns += staticfiles_urlpatterns()

@@ -14,11 +14,12 @@ import os
 import django_heroku
 import dj_database_url
 from decouple import config
+#import sys
 # from socket import gethostname
 
 
-
-
+#xadmin
+#sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -77,6 +78,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap4',
     'tinymce',
+    #'DjangoUeditor',
 ]
 
 MIDDLEWARE = [

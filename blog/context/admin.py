@@ -2,6 +2,9 @@ from django.contrib import admin
 from .models import *
 from tinymce.widgets import TinyMCE
 
+
+
+
 class TutorialAdmin(admin.ModelAdmin):
 
 
