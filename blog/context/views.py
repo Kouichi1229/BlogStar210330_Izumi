@@ -74,3 +74,12 @@ def create(request):
         'blog_post': blog_post,
     }
     return render(request, 'context/detail.html', context)
+
+def new(request):
+    blogEditForm = BlogEditForm()
+
+    context = {
+        'message': 'New blog_post',
+        'blogEditForm': blogEditForm,
+    }
+    return render(request, 'context/new.html', context)
