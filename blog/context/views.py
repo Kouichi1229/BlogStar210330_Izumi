@@ -51,17 +51,7 @@ def edit(request, id):
     return render(request, 'context/edit.html', context)
 
 def update(request, id):
-    if request.method == 'POST':
-        blog_post = get_object_or_404(Blog_Posts, pk=id)
-        blogEditForm = BlogEditForm(request.POST, instance=blog_post)
-        if blogEditForm.is_valid():
-            blogEditForm.save()
-
-    context = {
-        'message': blog_post.title,
-        'blog_post': blog_post,
-    }
-    return render(request, 'context/detail.html', context)
+    return HttpResponse('this is update ' + str(id))
 
 def create(request):
     if request.method == 'POST':
@@ -70,7 +60,7 @@ def create(request):
             blog_post = blogEditForm.save()
 
     context = {
-        'message': 'Create blog_post ' + str(blog_post.id),
+        'message': 'Create blog_post ',
         'blog_post': blog_post,
     }
     return render(request, 'context/detail.html', context)
