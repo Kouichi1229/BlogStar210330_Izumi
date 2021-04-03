@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import Blog_Posts
+from .forms import *
 # from django.contrib.auth.mixins import LoginRequiredMixin
 # from django.views.generic import TemplateView 
-#from .forms import BlogEditForm
 
 
 def index(request):
@@ -39,3 +39,26 @@ def delete(request, id):
     }
     return render(request, 'context/delete.html', context)
 
+def edit(request, id):
+    blog_posts = get_object_or_404(Blog_Posts, pk=id)
+    blogEditForm = BlogEditForm(instance=article)
+
+    context = {
+        'message': 'Edit Article',
+        'blog_posts': blog_posts,
+        'blogEditForm': blogEditForm,
+    }
+    return render(request, 'context/edit.html', context)
+
+def update(request, id):
+    if request.method == 'POST':
+        blog_post = get_object_or_404(Blog_Posts, pk=id)
+        blogEditForm = BlogEditForm(request.POST, instance=blog_post)
+        if blogEditForm.is_valid():
+            blogEditForm.save()
+
+    context = {
+        'message': blog_post.title,
+        'blog_post': blog_post,
+    }
+    return render(request, 'context/detail.html', context)
