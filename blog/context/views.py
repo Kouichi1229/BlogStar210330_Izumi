@@ -62,3 +62,15 @@ def update(request, id):
         'blog_post': blog_post,
     }
     return render(request, 'context/detail.html', context)
+
+    def create(request):
+    if request.method == 'POST':
+        blogEditForm = BlogEditForm(request.POST)
+        if blogEditForm.is_valid():
+            blog_post = blogEditForm.save()
+
+    context = {
+        'message': 'Create blog_post ' + str(blog_post.id),
+        'blog_post': blog_post,
+    }
+    return render(request, 'context/detail.html', context)
