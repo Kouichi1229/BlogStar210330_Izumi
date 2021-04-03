@@ -6,7 +6,7 @@
 	<h1><b>IT勉強帳</b></h1>
 	<br>
 	{% if user.is_authenticated %}
-	<a href="{% url 'blog:new' blog_post.id  %}" class='btn btn-outline-danger'>New</a>  
+	<a href="{% url 'blog:new'  %}" class='btn btn-outline-danger'>New</a>  
 	{% endif %}
 
 </header>
