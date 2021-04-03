@@ -63,7 +63,7 @@ def update(request, id):
     }
     return render(request, 'context/detail.html', context)
 
-    def create(request):
+def create(request):
     if request.method == 'POST':
         blogEditForm = BlogEditForm(request.POST)
         if blogEditForm.is_valid():
