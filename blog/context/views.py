@@ -51,7 +51,17 @@ def edit(request, id):
     return render(request, 'context/edit.html', context)
 
 def update(request, id):
-    return HttpResponse('this is update ' + str(id))
+    if request.method == 'POST':
+        blog_post = get_object_or_404(Blog_Posts, pk=id)
+        blogEditForm = BlogEditForm(request.POST, instance=blog_post)
+        if blogEditForm.is_valid():
+            blogEditForm.save()
+
+    context = {
+        'message': 'Update memo ' + str(id),
+        'blog_post': blog_post,
+    }
+    return render(request, 'context/show.html', context)
 
 def create(request):
     if request.method == 'POST':
