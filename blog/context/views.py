@@ -44,7 +44,7 @@ def edit(request, id):
     blogEditForm = BlogEditForm(instance=blog_posts)
 
     context = {
-        'message': blog_posts.title,
+        
         'blog_posts': blog_posts,
         'blogEditForm': blogEditForm,
     }
@@ -61,7 +61,7 @@ def update(request, id):
         'message': 'Update memo ' + str(id),
         'blog_post': blog_post,
     }
-    return render(request, 'context/show.html', context)
+    return render(request, 'context/detail.html', context)
 
 def create(request):
     if request.method == 'POST':
