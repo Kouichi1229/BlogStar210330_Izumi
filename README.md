@@ -1,5 +1,6 @@
 # BlogStar210330_Izumi
 My blog in python Django
+### Heroku 
 
 ![image](https://user-images.githubusercontent.com/24285484/159891995-ecc39809-efcc-4209-a92e-1eea00bcd6a1.png)
 
