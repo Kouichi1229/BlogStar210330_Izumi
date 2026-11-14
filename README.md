@@ -41,3 +41,15 @@
 ## 技術回顧
 
 更多實作證據、Notebook 範圍及技術限制，請參閱 [PROJECT_RETROSPECTIVE.md](PROJECT_RETROSPECTIVE.md)。
+
+## 歷史畫面
+
+![網站首頁](Iblog首頁.PNG)
+
+![文章列表](Iblog列表.PNG)
+
+![登入畫面](Iblog登入畫面.PNG)
+
+![登入後文章管理畫面](Iblog登入後新增列表畫面.PNG)
+
+![文章撰寫畫面](Iblog撰寫畫面.PNG)
