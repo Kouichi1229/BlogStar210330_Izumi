@@ -1,46 +1,61 @@
-# BlogStar｜Django 個人部落格與技術作品展示
+# BlogStar｜Izumi の個人 Blog
 
-本 Repository 保存一個以 Django 建置的個人部落格／作品展示網站，以及兩份獨立的 AI／資料處理 Notebook 實驗。
+這個 Repository 保存的是我在 2021 年左右開始製作的 Django 個人部落格。
 
-## 專案內容
+一開始是跟著日本線上教學學習 Django 與基本 CRUD，後來逐漸把練習延伸成自己的網站。我開始思考個人 Blog 需要哪些頁面、如何保存文章、如何登入管理內容，以及怎麼讓網站呈現出自己的風格。
 
-### Django 部落格網站
+這個專案對我而言，是第一個從教學練習出發、再由自己延伸功能與架構的網站作品。現在整理它的目的，是保存當時的成果與開發歷程，並讓它有機會重新成為一個可以自己使用的個人 Blog。
 
-- 首頁與個人介紹頁。
-- 技術文章列表與文章詳細頁。
-- 使用 Django Model 儲存文章標題、HTML 內容與發佈時間。
-- 使用 Django Admin 管理文章資料。
-- 使用 Django 內建 authentication routes 提供登入流程。
-- 文章內容欄位使用 TinyMCE HTML editor。
+## 網站原本包含的內容
 
-### 附屬 Notebook 實驗
+- 個人首頁與自我介紹
+- 技術文章列表與文章詳細頁
+- Django Model 與 ORM 文章資料存取
+- Django Admin 文章管理
+- Django Authentication 登入流程
+- TinyMCE 富文字編輯器與 HTML 文章內容
+- Bootstrap、W3.CSS 等前端版面資源
 
-- `weather_alert.ipynb`：讀取災害預警 JSON feed，嘗試篩選屏東或恆春相關的低溫及降雨訊息。
-- `日本語VL-T5推論.ipynb`：載入既有日文 VL-T5 與 Faster R-CNN 預訓練模型，進行圖片問答、圖文匹配、視覺定位及區域描述推論。
+> 編輯器使用 TinyMCE，並非 Markdown 編輯器。本專案沒有完成 Markdown 功能。
 
-這兩份 Notebook 是獨立實驗紀錄，不是 Django 網站的內建功能，也不代表自行訓練了 VL-T5 模型。
+## Repository 內的其他歷史檔案
+
+除了 Django Blog，Repository 後續也保存了兩份獨立 Notebook：
+
+- weather_alert.ipynb：公開災害預警 JSON Feed 的擷取與篩選實驗。
+- 日本語VL-T5推論.ipynb：使用日文 VL-T5 與 Faster R-CNN 預訓練模型進行視覺語言推論的實驗。
+
+這兩份 Notebook 不是 Blog 網站的功能，也不代表自行訓練了相關模型。
 
 ## 技術
 
-- Python、Django 2.2
+- Python、Django 2.2.x
 - Django ORM、Django Admin、Authentication
-- TinyMCE、HTML、CSS、Bootstrap
-- Python Requests、JSON
-- PyTorch、Transformers、VL-T5、Faster R-CNN（Notebook 推論實驗）
-- Heroku、Gunicorn、WhiteNoise（歷史部署設定分支）
+- TinyMCE、HTML、CSS、Bootstrap、W3.CSS
+- MySQL（main 分支目前設定的資料庫）
+- Heroku、Gunicorn、WhiteNoise（歷史部署分支）
+- Requests、JSON、PyTorch、Transformers（獨立 Notebook 實驗）
 
-## 重要說明
+## 分支說明
 
-- 本 Repository 依歷史程式碼整理，未重新安裝舊版相依套件或重新部署。
-- 部落格文章管理可透過 Django Admin；一般使用者介面的新增／編輯路由並未完整接通，部分表單與 view 為未完成或停用狀態。
-- 刪除文章的 view 目前透過 GET 路由執行，未見獨立的 POST 確認流程；不應視為符合現代安全實務的完整 CRUD。
-- `settings.py` 的 Django `SECRET_KEY` 已由原始字串改為 `SECRET_KEY` 佔位值。若要重新執行，必須先設定安全的環境變數並調整設定讀取方式。
-- Git 歷史未重寫，舊 commit 仍可能保留原始 secret。
-- Repository 中仍追蹤本機 SQLite 資料庫及大量 `node_modules`／舊虛擬環境檔案；本次沒有刪除或改動這些歷史檔案。
+| Branch | 用途 |
+|---|---|
+| main | 主要保存版本，包含網站截圖與後續上傳的實驗檔案 |
+| master | 早期 Django 網站版本 |
+| Herokubranch | 當年研究 Heroku 部署及前台 CRUD 的版本 |
+| docs/portfolio-retrospective | 專案歷史、技術回顧與保存文件 |
 
-## 技術回顧
+這些程式分支的起始歷史並非一般共同祖先分岔關係，請參閱回顧文件，不要在未比較內容前直接合併或刪除。
 
-更多實作證據、Notebook 範圍及技術限制，請參閱 [PROJECT_RETROSPECTIVE.md](PROJECT_RETROSPECTIVE.md)。
+## 目前狀態
+
+這是歷史專案保存與局部修復工作，並非已重新部署的線上服務。
+
+- 尚未完成舊環境重現與完整測試。
+- main 的前台新增／編輯文章流程並未完整啟用。
+- Repository 內有 SQLite 資料庫檔案，但尚未確認其中的資料內容。
+- 舊版部署設定與依賴需要重新評估。
+- Git 歷史可能仍保留舊的敏感設定，現行程式中的佔位值不代表歷史風險已完全解除。
 
 ## 歷史畫面
 
@@ -53,3 +68,7 @@
 ![登入後文章管理畫面](Iblog登入後新增列表畫面.PNG)
 
 ![文章撰寫畫面](Iblog撰寫畫面.PNG)
+
+## 專案回顧
+
+完整的開發歷程、分支差異、技術架構、資料庫注意事項與修復方向，請參閱 [PROJECT_RETROSPECTIVE.md](PROJECT_RETROSPECTIVE.md)。
