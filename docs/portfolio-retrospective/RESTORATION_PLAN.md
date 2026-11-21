@@ -1,201 +1,147 @@
-# BlogStar：個人網站修復計畫
+# BlogStar：個人網站重新啟用計畫
 
-> 本文件定義 BlogStar 的修復範圍、執行順序、風險與驗收條件。目標是讓原本的 Django 個人 Blog 能在可重現、可維護的環境中供作者個人使用，同時保存原始專案與歷史資料。
->
-> 本計畫以 `main` 分支的靜態程式碼盤點為基準。尚未完成的執行驗證會明確標示，不把程式碼存在等同功能可用。
+> 本文件定義最小可用修復範圍。目標不是復原 2021 年的資料或部署環境，而是讓原本的 Django 個人網站在現代本機環境重新運作。
 
 ## 1. 修復目標
 
 ### 主要目標
 
-- 保存原始網站的個人特色、頁面與 Django 架構。
-- 建立可重現的本機開發環境。
-- 確認並保護可能存在的舊文章與資料庫資料。
-- 恢復個人使用所需的登入、文章瀏覽、撰寫、編輯與刪除流程。
-- 修正明確的安全性與穩定性問題。
-- 留下清楚的安裝、啟動、備份與維護文件。
+- 以 `main` 分支為程式修復基準，保留原本網站的首頁、About Me、文章列表與文章詳細頁。
+- 在本機建立可重現的 Python / Django 環境。
+- 使用 SQLite 作為新的本機資料庫；舊資料庫檔案保留原狀，不作為新環境的資料來源。
+- 使用 Django Admin 管理文章，支援新增、查看、編輯與刪除。
+- 保留 TinyMCE 富文字編輯體驗。
+- 修正會阻止網站啟動或造成核心功能錯誤的問題。
+- 提供簡單的安裝、啟動與管理說明。
 
-### 非目標
+### 明確不做
 
-- 不將網站改造成多人使用或商業化產品。
-- 不為了追求新技術而全面重寫 Django 專案。
-- 不把 Notebook 實驗整合成 Blog 功能。
-- 不在沒有必要性與相容性評估前加入 Docker、Redis、Celery 或其他服務。
-- 不以重新部署到特定雲端平台作為修復成功的必要條件。
+- 不尋找或復原舊文章，不讀取舊文章內容。
+- 不為了舊文章而處理舊桌機、舊 MySQL 或可能存在的 PostgreSQL。
+- 不重現 Heroku 部署，不做公開部署。
+- 不重新實作前台新增／編輯／刪除介面；文章管理以 Django Admin 為準。
+- 不重寫網站外觀，不整合 Notebook，不做多人產品化或不必要的基礎設施。
+- 不刪除歷史分支、Notebook、圖片、舊 SQLite 或其他原始資產。
 
-## 2. 修復基準與目前已知狀態
+## 2. 修復基準與技術方案
 
-### 基準版本
-
-| 項目 | 值 |
+| 項目 | 決定 |
 |---|---|
 | Repository | `Kouichi1229/BlogStar210330_Izumi` |
-| 主要修復基底 | `main` |
-| 盤點基準 Commit | `6bff2a39440a50c8bc79efda9aadbdef374616fa` |
-| Django | 2.2.6（由專案程式與 Migration 註記確認） |
-| Django App | `context` |
-| 文章 Model | `Blog_Posts` |
-| 編輯器 | TinyMCE HTMLField |
+| 程式修復基準 | `main` |
+| 基準 Commit | `6bff2a39440a50c8bc79efda9aadbdef374616fa` |
+| Python | 3.12 |
+| Django | 5.2 LTS，採用當前可用的 5.2.x 安全修補版本 |
+| Database | SQLite，新建本機資料庫 |
+| Rich Text Editor | 與 Django 5.2 相容的 django-tinymce 5.x |
+| 管理介面 | Django Admin |
+| 執行方式 | 本機開發伺服器，僅供個人使用 |
 | 文件分支 | `docs/portfolio-retrospective` |
 
-### 已確認的主要結構
+選擇依據：
+- Django 5.2 是 LTS 系列，官方安全支援至 2028 年 4 月。
+- Django 5.2 支援 Python 3.10–3.14；本專案選用 Python 3.12。
+- django-tinymce 5.0.0 官方套件資訊列出支援 Django 4.2–5.2 與 Python 3.9 以上。
+- SQLite 隨 Python 提供，適合本機個人網站，不需要額外資料庫服務。
 
-- 專案設定：`blog/blog/settings.py`、`blog/blog/urls.py`
-- App 程式：`blog/context/models.py`、`forms.py`、`views.py`、`urls.py`、`admin.py`
-- Migration：`blog/context/migrations/0001_initial.py` 至 `0003_auto_20210328_0034.py`
-- Templates：首頁、About Me、文章列表、詳細頁、新增頁、刪除結果頁及登入／登出頁。
-- 靜態資產：`blog/context/static/`
-- SQLite 檔案：`blog/db.sqlite3`
-- main 的 Settings 目前啟用 MySQL，SQLite 設定被註解。
+以上版本是目標相容組合；實際安裝時仍須鎖定可取得的安全修補版本，並以乾淨環境測試確認。
 
-### 已知待處理問題
+## 3. 已確認的程式問題
 
-| 優先級 | 問題 | 目前證據／位置 |
+| 優先級 | 問題 | 修復方向 |
 |---|---|---|
-| P0 | 刪除文章使用 GET，且 View 未見後端登入保護 | `context/urls.py`、`views.py` |
-| P0 | Secret Key 為佔位字串 | `blog/settings.py` |
-| P0 | DEBUG=True、ALLOWED_HOSTS=['*'] | `blog/settings.py` |
-| P1 | Model 的 `published_time` 使用 `default=datetime.now()` | `context/models.py` |
-| P1 | ModelForm 欄位名稱 `published_time ` 有尾端空白 | `context/forms.py` |
-| P1 | 前台新增／編輯 View 與 URL 未完整啟用 | `context/views.py`、`context/urls.py` |
-| P1 | 新增頁的 Submit button 位於 form 外 | `templates/context/new.html` |
-| P1 | 文章詳細頁以 `safe` 顯示 HTML | `templates/context/detail.html` |
-| P2 | 文章列表分頁是靜態連結 | `templates/context/list.html` |
-| P2 | Static 設定路徑與實際資產位置需要重新驗證 | `blog/settings.py`、`context/static/` |
-| P2 | main 缺少 Python requirements manifest，且追蹤 node_modules／__pycache__ | Repository Tree |
+| P0 | Settings 使用佔位 Secret Key、DEBUG=True、ALLOWED_HOSTS=['*'] | 使用環境設定與本機安全預設值 |
+| P0 | 刪除文章使用 GET，且沒有後端登入保護 | 不再提供前台刪除路由；由 Django Admin 權限管理 |
+| P1 | Model 的 `published_time` 使用 `default=datetime.now()` | 改用適當的 callable default，或依 Django 時區策略設定 |
+| P1 | ModelForm 欄位名稱 `published_time ` 有尾端空白 | 若不再使用前台表單，移除未使用表單；否則修正欄位名稱 |
+| P1 | 前台新增／編輯流程未完整啟用 | 不重建前台 CRUD，改由 Django Admin 提供 |
+| P1 | 新增頁 Submit button 位於 form 外 | 若不再使用該頁，確認後移除未使用路由／模板引用 |
+| P1 | 詳細頁使用 `safe` 顯示 TinyMCE HTML | 檢查輸入與輸出安全邊界，避免危險 HTML 執行 |
+| P1 | 部分模板繼承不同 layout，可能造成頁面樣式不一致 | 統一模板繼承並驗證主要頁面 |
+| P2 | main 缺少 Python requirements manifest | 建立最小且鎖定版本的依賴清單 |
+| P2 | Settings 的 Static 路徑需重新驗證 | 以 Django staticfiles 慣例修正並測試 |
+| P2 | Repository 追蹤 node_modules／__pycache__ | 先確認必要性；本次不因清理而大量刪除歷史檔案 |
 
-以上為靜態檢視結果；實際錯誤與修復方式仍須在隔離環境中驗證。
+## 4. 執行階段與驗收條件
 
-## 3. 執行階段與驗收條件
-
-### Phase 0 — 文件與基準保存
+### Phase 0 — 修復基準與隔離
 
 工作：
-- 維護 README、專案回顧與本修復計畫。
-- 記錄修復基底 Commit、分支及工作樹狀態。
-- 明確區分已確認事實、作者回憶與待驗證事項。
+- 從 main 建立獨立修復分支，不直接在 main 上開發。
+- 保留 main 與文件分支現況。
+- 確認每次變更只涉及核准的修復檔案。
+- 不操作舊 SQLite，不連線任何 MySQL／PostgreSQL。
 
 驗收：
-- 文件內容與程式碼現況一致。
-- 每次實作均能指出修改檔案、修改理由與驗證結果。
-- 不把尚未執行的測試描述為通過。
+- 修復分支起點為指定 main 基準 commit。
+- 原始 main 不被直接修改。
+- 舊資料庫與歷史資產保持不變。
 
-### Phase 1 — 資料來源確認與備份
+### Phase 1 — 現代環境重建
 
 工作：
-- 確認舊 SQLite 檔案是否含有需要保存的資料。
-- 釐清 MySQL 的實際位置、是否仍可存取，以及是否存在舊文章。
-- 確認 Migration 狀態與資料來源後，再決定採用 SQLite 或 MySQL 作為個人網站的正式資料庫。
-- 在任何資料庫遷移、結構變更或清理前建立可還原備份。
-
-已知限制：
-- main 的 `blog/db.sqlite3` 曾以唯讀方式辨識出 10 張 Django 內建資料表，沒有辨識到 `context_blog_posts`。
-- 尚未取得資料筆數，也未讀取資料列內容。
-- 這個結果不能推論外部 MySQL、其他分支或其他備份沒有文章。
+- 建立 Python 3.12 隔離環境。
+- 建立最小依賴清單，採用 Django 5.2.x 與相容的 django-tinymce 5.x。
+- 將資料庫設定改為新的本機 SQLite。
+- 修正必要的 Settings、URL 與 staticfiles 設定。
+- 檢查並執行 Django system check 與 migration；只對新建 SQLite 資料庫操作。
 
 驗收：
-- 資料庫來源、用途與選定方案有書面紀錄。
-- 備份檔存在且可驗證；如有必要，完成一次還原演練。
-- 未確認資料保存需求前，不覆寫、不刪除舊資料庫。
+- 可從乾淨環境安裝依賴。
+- `manage.py check` 通過。
+- Migration 可在新 SQLite 資料庫成功執行。
+- `runserver` 可啟動，首頁可載入。
 
-### Phase 2 — 隔離環境重建
+### Phase 2 — 核心頁面與文章管理
 
 工作：
-- 確認可用 Python 版本與 Django 2.2.6 的相容性。
-- 盤點實際需要的 Python 套件，建立明確的依賴清單。
-- 確認 MySQL driver、TinyMCE、Bootstrap 相關套件的需求。
-- 使用隔離的虛擬環境安裝依賴。
-- 設定本機開發用環境變數與資料庫連線。
-- 確認 static files 的來源路徑與收集方式。
+- 修復首頁、About Me、文章列表與文章詳細頁的模板繼承及路由。
+- 確保 Blog_Posts 正常註冊於 Django Admin。
+- 修復 Model 欄位與時間預設值。
+- 透過 Django Admin 完成文章新增、編輯、刪除。
+- 確認 TinyMCE 編輯器正常載入，文章 HTML 以安全方式呈現。
 
 驗收：
-- 依文件可從乾淨環境安裝依賴。
-- Django 管理指令可正常載入設定。
-- Migration 狀態可檢查，且不會對原始資料庫執行未授權變更。
-- 本機開發伺服器可啟動，首頁與靜態資產正常載入。
-- 不要求此階段立即升級 Django；先以可重現為原則。
-
-### Phase 3 — 核心文章功能修復
-
-工作順序：
-1. 修正 Model 與 Form 的明確錯誤。
-2. 確認文章列表與詳細頁。
-3. 修復登入後新增文章流程。
-4. 建立或修復文章編輯流程。
-5. 將刪除操作改為 POST，加入 CSRF 與後端登入／權限檢查。
-6. 檢查文章時間欄位與時區處理。
-
-驗收：
-- 未登入使用者不能新增、編輯或刪除文章。
-- 已登入作者可新增文章並在列表與詳細頁看到內容。
-- 已登入作者可編輯既有文章，儲存後資料正確更新。
-- 刪除必須透過 POST，GET 請求不會刪除資料。
-- 無效表單會顯示錯誤，不會造成未定義變數或伺服器錯誤。
-- 列表、詳細頁及管理介面使用同一份正確資料。
-
-### Phase 4 — 內容安全與個人使用體驗
-
-工作：
-- 評估 TinyMCE HTML 輸入與 `safe` 顯示之間的安全邊界。
-- 決定 HTML 清理策略，避免未經處理的危險標籤或事件屬性。
-- 修正登入導向、登出、錯誤訊息與必要的操作提示。
-- 視實際文章數量決定是否實作真正分頁。
-- 保留首頁、About Me 與原始視覺風格，僅修復必要的顯示問題。
-
-驗收：
-- 一般文章格式（標題、段落、連結、清單、圖片等實際需要的內容）能正常保存與呈現。
+- 四個主要前台頁面可正常瀏覽。
+- Admin 可登入，未登入者不能進入管理介面。
+- 可在 Admin 建立、編輯、刪除測試文章。
+- 測試文章可在前台列表與詳細頁正確顯示。
 - 危險 HTML 不會以可執行形式輸出。
-- 登入、登出與操作失敗時的行為清楚。
-- 不為尚未需要的功能增加複雜度。
 
-### Phase 5 — 回歸測試與維護交付
+### Phase 3 — 回歸測試與交付
 
 工作：
-- 為 Model、表單、登入權限、CRUD 與主要頁面補上測試。
-- 檢查空資料、無效 ID、無效表單與未授權請求。
-- 整理安裝、啟動、資料庫備份與還原方式。
-- 更新 README 與已知限制。
+- 為 Model、主要頁面、Admin 權限與文章管理補上必要測試。
+- 整理安裝、啟動、建立管理員與資料庫備份說明。
+- 更新 README 與本修復計畫的完成狀態。
 
 驗收：
-- 自動化測試通過。
-- 手動驗收清單通過。
-- 新環境可依文件重建。
-- 資料庫可備份及還原。
-- 已知限制與未完成項目有明確紀錄。
+- 自動化測試與 Django system check 通過。
+- 可依文件在新環境重建網站。
+- 個人作者能完成登入與文章管理。
+- 未完成事項與本機使用限制有明確說明。
 
-## 4. 安全與資料保護規則
+## 5. 安全與資料保護規則
 
-以下操作在執行前必須先確認影響範圍與備份狀態：
-
-- 任何資料庫 Migration、資料清除、資料轉移或欄位變更。
-- 覆寫、移動或刪除 `db.sqlite3`、MySQL 資料或其他可能保存文章的檔案。
-- 刪除歷史圖片、靜態資產、Notebook、依賴目錄或 Git 分支。
-- 修改 Git 歷史、force push、合併歷史不相連的分支。
-- 部署至公開服務、修改 DNS、公開管理介面或啟用外部存取。
-- 讀取或輸出帳號、密碼雜湊、個人資料或文章正文等非必要內容。
-
-一般唯讀檢查與不影響資料的分析可持續進行。任何超出已授權文件整理範圍的程式碼、資料庫、Git 歷史或部署變更，應先提供具體檔案清單、操作內容、風險及回復方式，再取得確認。
-
-## 5. Git 與檔案整理原則
-
-- 以 `main` 作為修復參考基底；保留 `master` 與 `Herokubranch` 作為歷史參考。
-- 文件持續整理在既有 `docs/portfolio-retrospective` 分支。
-- 不因文件整理而重寫或合併程式分支歷史。
-- 不直接刪除已追蹤的 `node_modules` 或 `__pycache__`；先確認必要性、保存方式與未來版本控制策略。
-- 建立依賴清單時，以實際 import、設定與執行需求為依據，不照抄過時環境的全部套件。
-- 每個實作階段應保持範圍小、可檢查、可回復；完成後提供檔案清單、差異摘要、測試結果與未解決事項。
+- 不讀取舊 SQLite、舊文章、帳號或密碼雜湊。
+- 不連線舊 MySQL／PostgreSQL，不嘗試從舊桌機取回資料。
+- 新資料庫與舊資料庫使用不同檔案路徑；不覆寫舊 `blog/db.sqlite3`。
+- 不刪除歷史分支、Notebook、圖片、node_modules 或其他既有資產，除非另行確認。
+- 不修改 Git 歷史、不 force push、不部署公開服務。
+- 不將 Secret Key、管理員密碼或其他憑證提交到 Git。
+- Migration 僅可作用於新建的本機 SQLite 資料庫。
+- 每階段交付修改檔案清單、差異摘要、測試結果與未解決事項。
 
 ## 6. 最終完成定義
 
-只有在以下條件全部成立時，才將網站標示為「已完成基本修復」：
+以下條件全部成立，即視為完成基本重新啟用：
 
-- 作者能在文件指引下重建開發環境。
-- 作者能登入個人網站。
-- 作者能建立、閱讀、編輯與安全刪除文章。
-- 原有文章與必要資產已確認保存。
-- TinyMCE 內容能安全呈現。
-- 核心自動化測試與手動驗收通過。
-- 備份與還原方式有文件。
-- 未完成項目、部署限制與技術債務均有揭露。
+- Python 3.12 與 Django 5.2.x 環境可依文件重建。
+- 網站可在本機啟動。
+- 首頁、About Me、文章列表與文章詳細頁正常顯示。
+- 作者可透過 Django Admin 登入並新增、編輯、刪除文章。
+- TinyMCE 可正常編輯內容，文章內容安全呈現。
+- 核心測試與 Django system check 通過。
+- README 有清楚的安裝、啟動與管理說明。
 
-本計畫不要求重新部署到公開網路。若本機個人使用已符合需求，公開部署可作為獨立的後續決策。
+本專案不以找回舊文章、重現舊資料庫或重新公開部署作為完成條件。
