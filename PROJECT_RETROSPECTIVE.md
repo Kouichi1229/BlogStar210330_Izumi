@@ -1,131 +1,214 @@
-# BlogStar：技術經歷回顧
+# BlogStar：個人部落格專案回顧與保存紀錄
 
-> 本文件根據 Repository 中的 Django 程式碼、HTML templates、資料模型、路由、部署分支及兩份 Notebook 整理。沒有重新部署或執行完整測試，因此不將歷史程式碼描述為目前可用服務。
+> 本文件用來保存這個個人網站的開發歷程、技術選擇、分支差異與未來修復注意事項。它不是履歷包裝，也不把尚未完成的功能描述成已完成產品。
+>
+> 內容依 Repository 中的程式碼、Git commit、templates、migrations、部署設定與 Notebook 整理。作者對當年操作的回憶會另外標示；未重新執行驗證的部分，不宣稱目前仍可正常運作。
 
-## 1. 專案組成
+## 1. 專案的由來與定位
 
-這個 Repository 其實包含三個不同性質的實作：
+BlogStar 是一個以 Django 開發的個人 Blog。最初從日本線上教學中的 Django CRUD 練習開始，後來逐步延伸成自己的網站：除了文章列表與文章內容，也加入首頁、個人介紹、登入、文章管理介面、版面設計與部署嘗試。
 
-1. **Django 個人部落格：** 文章展示、個人介紹、登入與管理功能。
-2. **災害預警資料擷取實驗：** 從公開 JSON feed 取得低溫與降雨警報，嘗試篩選指定地區訊息。
-3. **日文視覺語言模型推論實驗：** 使用既有 VL-T5 與 Faster R-CNN 預訓練模型進行視覺語言任務推論。
+它的價值不只在於完成 CRUD 範例，而在於記錄一段自主開發的過程：從理解框架與資料庫操作，逐步思考個人 Blog 實際需要哪些頁面、資料欄位、操作流程與使用體驗。
 
-三者不應被描述成同一個應用系統的功能模組。
+這是一個供作者個人使用的網站。未來修復以作者本人能夠使用、撰寫與保存文章，以及專案能在可控環境中重新啟動為優先；不需要為多人協作、商業營運或大型產品增加不必要的複雜度。
 
-## 2. Django 個人部落格
+## 2. 開發歷程
 
-### 可由程式碼確認的功能
+### 2021 年 3 月：建立 Django 專案
 
-- 使用 Django 2.2 建立專案與 `context` app。
-- 以 `Blog_Posts` Model 儲存文章標題、HTML 內容及發佈時間。
-- 透過 Django ORM 查詢文章列表及單篇文章。
-- 使用 Django templates 呈現首頁、個人介紹、文章列表及詳細內容。
-- 將 `Blog_Posts` 註冊到 Django Admin，可透過管理後台管理文章。
-- 使用 Django 內建 authentication URL patterns 提供登入／登出路由。
-- 文章內容使用 TinyMCE HTMLField，支援富文字內容。
-- 前端使用 Bootstrap、W3.CSS、Bootstrap Icons 等資源建立網站版面。
+- main 的起始 commit 為 2021-03-30，訊息為「blog up 0330」。
+- master 的起始 commit 為 2021-03-31。
+- 專案以 Django 建立，包含文章 Model、View、URL routing、HTML templates 與 Django Admin。
+- 網站名稱與介面以「Izumiの家」為主，也包含個人介紹與技術作品展示。
 
-### 程式結構
+### 2021 年 4 月：CRUD 延伸與 Heroku 部署研究
 
-| 檔案 | 職責 |
-|---|---|
-| `blog/blog/settings.py` | Django 專案設定、App、Middleware、資料庫及靜態檔案設定 |
-| `blog/blog/urls.py` | Admin、文章 app、authentication、TinyMCE 路由 |
-| `blog/context/models.py` | 文章資料模型 |
-| `blog/context/views.py` | 首頁、個人介紹、文章列表、文章詳細頁及刪除 view |
-| `blog/context/urls.py` | 網站頁面路由 |
-| `blog/context/admin.py` | 註冊文章 Model 至 Django Admin |
-| `blog/context/templates/` | 網站頁面模板 |
+Herokubranch 的起始 commit 是 2021-04-02，訊息為「heroku push」。接下來幾天的 commit 記錄了部署與功能調整，例如：
 
-### 功能邊界
+- 加入資料庫與調整資料庫設定。
+- 安裝 django-heroku 相關套件及部署依賴。
+- 調整 static files。
+- 加入或調整文章新增、編輯與更新流程。
+- 安裝 TinyMCE 相關套件並修改表單及 templates。
+- 2021-04-04 出現「heroku-V1」commit。
 
-- 一般使用者介面具備文章列表與詳細頁。
-- 文章資料可透過 Django Admin 管理。
-- Repository 有建立文章的表單模板，但目前 `views.py` 中表單 view 與對應路由已註解，不能宣稱前台新增／編輯流程完整。
-- 刪除文章的路由使用 GET 方法直接執行刪除，沒有看到 POST 確認流程。這是歷史實作限制，不符合較安全的現代刪除操作設計。
-- `published_time` 的 Model default 使用 `datetime.now()` 的呼叫結果，而不是可延後呼叫的 callable；模型載入時會固定預設時間值，可能造成新文章時間不如預期。
-- 文章詳細頁以 `safe` filter 呈現 HTML 內容；若內容來源未受信任，需額外考慮 HTML sanitization。
+這些 commit 可證明當時曾密集研究部署、資料庫與文章 CRUD；但 Git 歷史不能完整還原作者當時每一個終端機指令或操作原因。
 
-## 3. 災害預警資料擷取 Notebook
+### 2021 年 12 月至 2022 年 3 月：其他實驗檔案進入 Repository
 
-檔案：`weather_alert.ipynb`
+main 的後續 commit 在 2021 年底至 2022 年 3 月增加了 Notebook 與其他上傳內容，包括：
 
-### 可由程式碼確認的流程
+- weather_alert.ipynb
+- 日本語VL-T5推論.ipynb
 
-- 使用 Requests 讀取國家災害防救科技中心的 JSON Atom Feed。
-- 程式分別保存低溫與降雨預警資料來源 URL。
-- 解析 JSON 後，逐筆讀取 `entry` 中的警報摘要。
-- 以「屏東」或「恆春」作為字串條件，嘗試篩選與目標區域相關的警報。
+這些檔案與 Django Blog 的網站功能沒有直接依賴關係，應視為 Repository 中另外保存的資料處理／AI 推論實驗。
 
-### 技術定位與限制
+作者回憶，這些 Notebook 可能是在當時整理或上傳檔案時混入 Repository。這是作者對當年操作的回憶；Git commit 本身只能證明檔案在後續提交中被加入，無法單獨證實是否為誤傳。
 
-這份 Notebook 可佐證 Python Requests、JSON 解析及文字條件篩選的實作接觸，但不是完整的即時預警系統。現有程式有變數生命週期與錯誤處理問題：篩選函式在沒有符合資料時可能使用未初始化變數；外層程式的 `finally` 又會將結果變數設為 `None`。Notebook 保存的輸出也曾顯示 `None`，因此不能宣稱預警擷取流程已穩定運作。
+## 3. Git 分支與版本定位
 
-## 4. 日文 VL-T5 視覺語言模型推論
-
-檔案：`日本語VL-T5推論.ipynb`
-
-### 可由程式碼確認的流程
-
-1. 在 Google Colab 環境 clone 日文 VL-T5 專案。
-2. 安裝指定版本的 Transformers、SentencePiece 等相依套件。
-3. 載入 `sonoisa/vl-t5-base-japanese` 預訓練模型及 tokenizer。
-4. 載入 `unc-nlp/frcnn-vg-finetuned` Faster R-CNN 預訓練模型。
-5. 以 Faster R-CNN 抽取影像區域特徵與 bounding boxes。
-6. 將日文任務提示與視覺特徵輸入 VL-T5，執行生成式推論。
-7. 示範以下任務：
-   - VQA：日文圖片問答。
-   - Image-text matching：判斷圖片與文字描述是否匹配。
-   - Visual grounding：定位文字描述對應的影像區域。
-   - Region captioning：為指定影像區域產生描述。
-
-Notebook 保存的輸出包含對騎馬圖片的日文問答結果，以及圖文匹配、區域定位等推論紀錄。
-
-### 合理的能力描述
-
-這份 Notebook 可呈現使用既有多模態預訓練模型、模型載入、GPU／CPU 裝置選擇、影像前處理、視覺特徵抽取及生成式推論流程的實作經驗。
-
-**不可宣稱自行訓練 VL-T5 或 Faster R-CNN。** Notebook 主要使用已發布的預訓練權重，沒有自行訓練資料集、訓練迴圈、loss 計算或模型評估流程的證據。它也不是完整 benchmark，不能將單張示範圖片的輸出視為模型準確率。
-
-## 5. 部署與相依環境
-
-- `Herokubranch` 保存 Heroku 部署設定，包括 Gunicorn Procfile、Python 3.7.10 runtime、requirements 及 WhiteNoise／django-heroku 相關設定。
-- `main` 分支的 Django settings 使用本機 MySQL 開發連線設定；`Herokubranch` 則有 Heroku 部署配置。
-- Repository 內有大量已提交的 `node_modules`、虛擬環境套件檔及 SQLite 資料庫，增加檔案體積，也使原始碼與環境產物混雜。
-- 部分依賴版本相當舊，沒有重新安裝及執行驗證，因此無法保證在現代 Python／Django 環境可直接啟動。
-
-## 6. 技術能力摘要
-
-| 技術 | 程式證據 | 合理定位 |
+| 分支 | 可確認的歷史 | 建議定位 |
 |---|---|---|
-| Python | Django、Notebook | 有 Python 應用與資料處理經驗 |
-| Django | Model、View、URL、Template、Admin | 有 MVC／MTV 網站開發經驗 |
-| Django ORM | 文章資料模型與查詢 | 有 ORM 基本資料存取經驗 |
-| Authentication | Django auth routes、登入模板 | 有網站登入流程整合經驗 |
-| TinyMCE | HTMLField | 有富文字內容編輯器整合經驗 |
-| Requests／JSON | 災害警報 Notebook | 有外部 JSON API 擷取與解析經驗 |
-| PyTorch／Transformers | VL-T5 推論 Notebook | 有多模態預訓練模型載入與推論經驗 |
-| Faster R-CNN | 影像區域抽取 | 有使用物件偵測模型產生視覺特徵的經驗 |
+| main | 2021-03-30 起始；後續有截圖、Notebook 與其他上傳內容 | 主要保存版本；建議作為未來修復基底 |
+| master | 2021-03-31 起始；保留早期 Django 網站程式 | 早期版本參考 |
+| Herokubranch | 2021-04-02 以「heroku push」起始；後續密集修改部署與 CRUD | 部署研究及功能演進參考 |
+| docs/portfolio-retrospective | 保存專案 README 與回顧文件 | 文件整理分支 |
 
-## 7. 履歷描述建議
+### 分支歷史的重要限制
 
-### Django 網站
+目前檢查到 main、master、Herokubranch 的起始 commit 各自沒有 parent commit，且 main 與 Herokubranch 的 GitHub compare 顯示沒有共同祖先。
 
-使用 Python、Django 開發個人部落格網站，建立文章資料模型、文章列表與詳細頁、個人介紹頁及 Django Admin 管理介面，整合 Django Authentication 與 TinyMCE 富文字編輯器，並使用 Bootstrap 等前端資源完成頁面呈現。
+因此，這三條分支不是一般從同一個共同 commit 分岔出來的標準分支關係。它們更像是分別建立並各自保存的程式版本。這與作者回憶當年研究部署、分支操作不熟悉的情況相容，但不能只憑 Git 資料斷定當年實際如何操作。
 
-### AI 推論實驗
+**保存原則：** 不要為了整理而直接合併或刪除這些分支。它們保留了不同時間點的程式與嘗試，應先比較差異，再決定哪些功能值得移植到修復版本。
 
-使用 Google Colab、PyTorch 與 Transformers 載入日文 VL-T5 及 Faster R-CNN 預訓練模型，完成影像特徵抽取與日文視覺語言推論示範，涵蓋圖片問答、圖文匹配、視覺定位及區域描述任務。
+## 4. Django 網站功能與架構
 
-## 8. 安全與隱私整理紀錄
+### 網站頁面
 
-- Django settings 中原本直接寫入的 `SECRET_KEY` 已在目前的 `main`、`master` 與 `Herokubranch` 分支替換為 `SECRET_KEY` 佔位值。
-- Git commit history 未重寫，舊 commit 仍可能保留原始 secret。若網站曾使用該金鑰，應視為已曝光並重新產生。
-- 網站首頁模板包含一個電子郵件地址；本次未修改，因為它可能原本就是公開聯絡方式，是否保留應由作者決定。
-- Repository 內含已追蹤的 SQLite 資料庫檔案；本次沒有讀取其內容或刪除它。若資料庫含個人資料、登入帳號或非公開文章，需另行檢視公開風險。
+目前 templates 可確認包含：
 
-## 9. 驗證界線
+- 首頁：介紹網站與作者。
+- About Me：個人介紹、技能與其他作品展示。
+- 文章列表：顯示文章資料。
+- 文章詳細頁：呈現單篇文章內容。
+- 登入／登出相關頁面：使用 Django authentication templates 與 URL patterns。
 
-- Django 程式以靜態檢視為主，沒有重新安裝依賴、執行 migrations 或啟動伺服器。
-- Notebook 僅依現有程式碼與保存輸出判斷，沒有重新下載模型或重新執行 GPU 推論。
-- Heroku 部署分支只證明曾保存部署設定，不代表歷史服務目前仍存在或可用。
+### 文章資料模型
+
+| 欄位 | 型別／用途 |
+|---|---|
+| title | 最長 200 字元的文章標題 |
+| content | 文章內容；main 使用 TinyMCE 的 HTMLField |
+| published_time | 文章發佈時間 |
+
+### 主要技術
+
+- Python、Django 2.2.x
+- Django ORM、Django Admin、Django Authentication
+- TinyMCE
+- HTML、CSS、Bootstrap、W3.CSS
+- MySQL（main 目前設定中的資料庫）
+- SQLite（Repository 另有追蹤資料庫檔案，實際用途及內容尚待確認）
+
+### TinyMCE 與 Markdown 的區別
+
+這個專案使用 TinyMCE 富文字編輯器，搭配 Django 的 HTMLField 儲存 HTML 內容。
+
+**本專案沒有完成 Markdown 編輯功能。** TinyMCE 是所見即所得（WYSIWYG）富文字編輯器，不應在文件或作品說明中稱為 Markdown 套件。
+
+Herokubranch 的 requirements 曾出現 DjangoUeditor 相關依賴，但目前檢視到的 settings、Model 與 templates 尚不足以證明它曾真正整合到網站功能中，因此不把它列為已使用的編輯器。
+
+## 5. 各分支功能差異
+
+### main
+
+- 有首頁、個人介紹、文章列表、文章詳細頁與登入相關頁面。
+- Blog_Posts 的 content 使用 TinyMCE HTMLField。
+- 有 Django Admin 文章管理。
+- 前台新增／編輯文章的 View 與 URL 並未完整啟用；存在表單模板不代表操作流程已完成。
+- 有文章刪除 View，但目前使用 GET 路由執行刪除，需在修復時改為安全的 POST 操作並確認權限。
+
+### Herokubranch
+
+- 有前台新增、編輯、更新等 View、URL 與 edit.html。
+- 相關流程仍有錯誤處理缺口，例如表單驗證失敗或非預期請求時，可能使用尚未建立的變數。
+- content 使用一般 TextField，與 main 的 TinyMCE HTMLField 不同。
+- 保存 Heroku 部署設定，適合參考當年的部署嘗試，不宜直接取代 main。
+
+### master
+
+- 保留早期網站程式。
+- 主要頁面與 main 有大量重疊，但沒有 main 後續加入的截圖與 Notebook。
+- 可作為早期程式差異的參考版本。
+
+## 6. SQLite 資料庫：目前已知與未知
+
+Repository 的 main 分支追蹤了 blog/db.sqlite3，Git tree 顯示檔案大小為 131,072 bytes（128 KiB）。
+
+但 main 的 blog/blog/settings.py 目前啟用的是 MySQL：
+
+- Engine：django.db.backends.mysql
+- Database：blogdb
+- Host：127.0.0.1
+- Port：3306
+
+SQLite 設定則被註解：
+
+- django.db.backends.sqlite3
+- BASE_DIR 下的 db.sqlite3
+
+因此可以確認 SQLite 檔案存在於 Repository，但**目前不能確認檔案內有多少篇文章、是否包含完整貼文、是否為早期版本資料，或是否只是測試資料庫**。
+
+由於它可能含有私人文章或帳號資料，檢查時應先只確認資料表名稱、欄位與各表筆數，不讀取或公開文章標題、正文、密碼雜湊或個人資料。確認內容後再決定是否保留、備份或轉移。
+
+## 7. 歷史部署設定
+
+Herokubranch 保存了當年的部署相關檔案：
+
+- blog/Procfile
+- blog/runtime.txt
+- blog/requirements.txt
+- WhiteNoise、Gunicorn、django-heroku、dj-database-url 等相關依賴
+
+其中 runtime 指定 Python 3.7.10，Procfile 使用 Gunicorn 啟動 Django WSGI application。
+
+這些檔案是歷史部署紀錄，不代表 Heroku 上的舊服務仍存在，也不代表原環境能在目前的平台直接重現。未來若要重新部署，應先確認個人網站實際需求，再選擇維護成本合理的方式，不必為了重現 Heroku 而保留過時依賴。
+
+## 8. 其他 Notebook 的定位
+
+### weather_alert.ipynb
+
+使用 Requests 讀取公開 JSON Feed，解析低溫與降雨警報，再以地區關鍵字篩選訊息。它是獨立的資料擷取實驗，不是 Blog 網站功能，也不應描述為已完成的即時預警服務。
+
+### 日本語VL-T5推論.ipynb
+
+使用既有的日文 VL-T5 與 Faster R-CNN 預訓練模型進行推論示範，包含圖片問答、圖文匹配、視覺定位與區域描述等任務。
+
+目前證據支持「載入並使用預訓練模型進行推論」，不支持「自行訓練 VL-T5 或 Faster R-CNN」。
+
+## 9. 已知技術問題與修復方向
+
+| 項目 | 已知狀況 | 修復方向 |
+|---|---|---|
+| Django 版本 | 2.2.x，年代久遠 | 先建立可重現環境，再評估升級 |
+| Secret Key | 現行程式以佔位字串取代 | 改由環境變數提供；檢查 Git 歷史中的舊值 |
+| DEBUG／ALLOWED_HOSTS | main 仍是 DEBUG=True、ALLOWED_HOSTS=['*'] | 依個人本機或正式部署環境分開設定 |
+| 資料庫 | MySQL 設定啟用，SQLite 檔案另行追蹤 | 先確認 SQLite 內容與保存需求 |
+| published_time | Model 使用 default=datetime.now() | 改為可呼叫的時間函式，並檢查時區 |
+| Form 欄位 | main 的 Form 欄位名稱曾出現尾端空白 | 修正欄位名稱 |
+| 刪除操作 | GET 請求可觸發刪除 | 改用 POST、CSRF 保護與適當權限 |
+| HTML 內容 | detail template 使用 safe 顯示內容 | 評估 HTML 清理與可信任內容邊界 |
+| 前台 CRUD | main 的新增／編輯流程未完整接通 | 依個人使用需求補齊，不追求不必要功能 |
+| 靜態檔案 | 有舊版 static 路徑與部署設定 | 重新驗證收集與載入方式 |
+| Repository 體積 | 曾追蹤 node_modules、Python env 等環境產物 | 先保存歷史，再決定是否從未來版本排除 |
+
+## 10. 未來修復的範圍與原則
+
+本專案的修復目標是「讓原本的個人 Blog 可以再次使用」，而不是重寫成新的產品。
+
+建議順序：
+
+1. **文件整理：** 整理專案故事、分支歷史、技術架構、資料庫狀態與操作說明。
+2. **資料保存：** 確認 SQLite 是否含有文章及其他重要資料，建立安全備份。
+3. **環境重現：** 確認 Python、Django 與舊依賴能否在隔離環境啟動。
+4. **必要修復：** 修正設定、文章新增／編輯／刪除、登入權限及內容安全問題。
+5. **個人使用驗證：** 確認作者能登入、管理文章、撰寫內容、瀏覽歷史文章。
+6. **保存與展示：** 保留歷史截圖、README、安裝步驟與已知限制。
+
+### 不在目前目標內
+
+- 不為多人使用設計複雜的角色與權限系統。
+- 不為了技術新潮而全面改寫成 React 或其他框架。
+- 不把兩份 Notebook 強行整合進 Blog。
+- 不在確認資料庫內容前刪除 SQLite。
+- 不在未確認必要性前刪除 node_modules、env 或歷史分支。
+- 不把未驗證的歷史部署描述成目前可用的服務。
+
+## 11. 驗證界線
+
+- 本文件中的程式功能描述來自靜態程式碼檢視。
+- 尚未重新安裝依賴、執行 migrations、啟動 Django server 或重新部署。
+- SQLite 尚未讀取資料表或資料列；目前僅確認 Repository 中存在該檔案及其 Git tree 檔案大小。
+- Notebook 的描述依現有程式碼與保存輸出，不代表已在目前環境重新執行。
+- Git commit 可以佐證提交時間與檔案變化，但不能完整還原作者當年的每一個操作意圖。
