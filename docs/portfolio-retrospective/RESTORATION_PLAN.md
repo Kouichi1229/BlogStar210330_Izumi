@@ -145,3 +145,63 @@
 - README 有清楚的安裝、啟動與管理說明。
 
 本專案不以找回舊文章、重現舊資料庫或重新公開部署作為完成條件。
+
+
+## 7. 執行進度紀錄（2026-11-21）
+
+本節記錄目前已提交的程式與文件工作。**程式碼已提交不等於 Django 執行驗收通過**；尚未在 Python 3.12 的乾淨環境中執行的項目，明確標示為待驗證。
+
+### 分支與提交
+
+| 用途 | 分支 | 最新已知 Commit |
+|---|---|---|
+| 文件整理 | `docs/portfolio-retrospective` | `28b56adc42cf1525b805b8ba748478ae467f4099`（本文件更新前） |
+| 程式修復 | `restore/django-5.2-local` | `cb2a5d7ffd1ddc03d79b0f0a5b42acf5ceb5d47d`（README 更新後） |
+| 修復基準 | `main` | `6bff2a39440a50c8bc79efda9aadbdef374616fa` |
+
+### 已提交的程式變更
+
+- 建立 Django 5.2.19 與 django-tinymce 5.0.0 的依賴清單。
+- 將資料庫設定改為獨立的 `blog/db.local.sqlite3`，舊 `blog/db.sqlite3` 不在修復差異中。
+- 改用本機用途的 Secret Key 環境變數設定與 localhost ALLOWED_HOSTS。
+- 將文章時間預設值改為 `django.utils.timezone.now`，並新增對應 migration。
+- 新增 migration，讓既有 migration state 的 TextField 與目前 Model 使用的 TinyMCE HTMLField 一致。
+- 將文章管理集中至 Django Admin，移除前台 GET 刪除路由。
+- 加入 `nh3` HTML sanitizer，並在文章詳細頁使用。
+- 整理主要模板繼承與 Django 5.2 登出 POST 表單。
+- 新增主要頁面、Admin 權限、時間預設值及 HTML 清理的測試案例。
+
+### 已提交的文件變更
+
+- 修復分支的 `README.md` 已加入 macOS 本機安裝、虛擬環境、依賴安裝、Secret Key、Migration、建立管理員、測試、啟動、資料庫備份及歷史截圖說明。
+- README 明確指出 Django 執行驗收尚未完成，不將程式碼提交誤報為網站已成功啟動。
+
+### 階段狀態
+
+| 階段 | 狀態 | 說明 |
+|---|---|---|
+| Phase 0 — 修復基準與隔離 | 已完成 | 修復分支由指定 main commit 建立；main HEAD 未變更 |
+| Phase 1 — 現代環境重建 | 程式修改已提交；執行驗收待完成 | Settings、依賴清單、新 SQLite 路徑及 migrations 已提交；尚未在乾淨 Python 3.12 環境安裝及執行 |
+| Phase 2 — 核心頁面與文章管理 | 程式修改已提交；功能驗收待完成 | 模板、路由、Admin、TinyMCE 與 sanitizer 已實作；尚未用瀏覽器完成操作驗證 |
+| Phase 3 — 回歸測試與交付 | 部分完成 | 已新增測試案例及 README 操作文件；尚未執行測試及確認乾淨環境可重建 |
+
+### 尚待執行的驗收
+
+必須在 Python 3.12 環境、Repository 的 `blog/` 目錄中執行，且確認使用新的 `db.local.sqlite3`：
+
+1. `python manage.py check`
+2. `python manage.py makemigrations --check --dry-run`
+3. `python manage.py migrate`
+4. `python manage.py test`
+5. `python manage.py runserver`
+6. 透過瀏覽器驗證首頁、About Me、文章列表、文章詳細頁、Admin 登入、文章 CRUD 與 TinyMCE 編輯器。
+
+上述命令尚未執行前，不應標記為通過。若驗收出現錯誤，先記錄錯誤訊息並定位原因，再針對最小範圍修正；不得以未經驗證的成功敘述取代實際測試結果。
+
+### 安全與資料邊界
+
+- 不讀取或修改歷史 `blog/db.sqlite3`。
+- Migration 只允許對新建的 `blog/db.local.sqlite3` 執行。
+- 不連接 MySQL／PostgreSQL，不啟動公開服務。
+- 不提交本機資料庫、Secret Key 或管理員密碼。
+- 不修改 main，不刪除舊分支或歷史資產。
