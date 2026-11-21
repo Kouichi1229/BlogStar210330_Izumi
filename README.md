@@ -100,6 +100,7 @@ export DJANGO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsa
 ```bash
 cd blog
 python manage.py check
+python manage.py makemigrations --check --dry-run
 python manage.py migrate
 ```
 
@@ -256,7 +257,7 @@ python manage.py runserver
 
 專案開發歷程、Git 分支差異與早期技術調查，請參考：
 
-- `PROJECT_RETROSPECTIVE.md`
-- `docs/portfolio-retrospective/RESTORATION_PLAN.md`
+- [專案回顧文件](https://github.com/Kouichi1229/BlogStar210330_Izumi/blob/docs/portfolio-retrospective/PROJECT_RETROSPECTIVE.md)
+- [修復計畫](https://github.com/Kouichi1229/BlogStar210330_Izumi/blob/docs/portfolio-retrospective/docs/portfolio-retrospective/RESTORATION_PLAN.md)
 
 本次修復不包含舊文章復原、舊 MySQL／PostgreSQL 連線或 Heroku 重新部署。
