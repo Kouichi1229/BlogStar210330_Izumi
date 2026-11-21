@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+.env
+.env.*
+
+# Local Django runtime artifacts
+blog/db.local.sqlite3
+blog/db.local.sqlite3-journal
+blog/staticfiles/
+
+# Local editor / OS files
+.DS_Store
+.vscode/
