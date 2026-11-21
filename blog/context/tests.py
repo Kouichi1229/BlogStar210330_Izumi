@@ -45,6 +45,7 @@ class BlogPageTests(TestCase):
         self.assertContains(response, "<p>Safe text</p>", html=True)
         self.assertNotContains(response, "onclick")
         self.assertNotContains(response, "<script>")
+        self.assertNotContains(response, 'alert("xss")')
 
     def test_published_time_uses_a_callable_default(self):
         before = timezone.now()
@@ -67,6 +68,7 @@ class BlogAdminTests(TestCase):
         self.assertIn("/admin/login/", response.url)
 
     def test_staff_user_can_open_blog_admin(self):
+        Blog_Posts.objects.create(title="Admin test post", content="")
         user = get_user_model().objects.create_superuser(
             username="site-owner",
             email="owner@example.com",
@@ -79,7 +81,7 @@ class BlogAdminTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test post") if Blog_Posts.objects.exists() else None
+        self.assertContains(response, "Admin test post")
 
     def test_non_staff_user_cannot_open_blog_admin(self):
         user = get_user_model().objects.create_user(

@@ -31,6 +31,7 @@ for tag in ("p", "div", "span", "img", "td", "th"):
 
 _CLEANER = nh3.Cleaner(
     tags=_ALLOWED_TAGS,
+    clean_content_tags={"script", "style"},
     attributes=_ALLOWED_ATTRIBUTES,
     url_schemes={"http", "https", "mailto"},
     filter_style_properties={
