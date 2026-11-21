@@ -124,23 +124,50 @@ Herokubranch 的 requirements 曾出現 DjangoUeditor 相關依賴，但目前�
 
 ## 6. SQLite 資料庫：目前已知與未知
 
-Repository 的 main 分支追蹤了 blog/db.sqlite3，Git tree 顯示檔案大小為 131,072 bytes（128 KiB）。
+Repository 的 main 分支追蹤了 `blog/db.sqlite3`。Git tree 顯示檔案大小為 131,072 bytes（128 KiB）；重新取得的檔案具有有效的 SQLite 3 檔案標頭。
 
-但 main 的 blog/blog/settings.py 目前啟用的是 MySQL：
+### 已確認的設定
 
-- Engine：django.db.backends.mysql
-- Database：blogdb
-- Host：127.0.0.1
-- Port：3306
+main 的 `blog/blog/settings.py` 目前啟用 MySQL：
+
+- Engine：`django.db.backends.mysql`
+- Database：`blogdb`
+- Host：`127.0.0.1`
+- Port：`3306`
 
 SQLite 設定則被註解：
 
-- django.db.backends.sqlite3
-- BASE_DIR 下的 db.sqlite3
+- `django.db.backends.sqlite3`
+- `BASE_DIR` 下的 `db.sqlite3`
 
-因此可以確認 SQLite 檔案存在於 Repository，但**目前不能確認檔案內有多少篇文章、是否包含完整貼文、是否為早期版本資料，或是否只是測試資料庫**。
+### 已確認的 SQLite 結構
 
-由於它可能含有私人文章或帳號資料，檢查時應先只確認資料表名稱、欄位與各表筆數，不讀取或公開文章標題、正文、密碼雜湊或個人資料。確認內容後再決定是否保留、備份或轉移。
+以唯讀方式檢查 SQLite 檔案中的 schema 定義字串，辨識到以下 10 張資料表：
+
+- `auth_user`
+- `auth_group`
+- `auth_permission`
+- `auth_user_groups`
+- `auth_user_user_permissions`
+- `auth_group_permissions`
+- `django_content_type`
+- `django_migrations`
+- `django_session`
+- `django_admin_log`
+
+沒有辨識到 `context_blog_posts`。依照目前 App 名稱 `context` 與 Model 名稱 `Blog_Posts`，Django 預設資料表名稱應為 `context_blog_posts`。
+
+因此，**這份 main 分支中的 SQLite 檔案目前沒有顯示 Blog 文章 Model 對應的資料表**。它包含 Django 內建認證、權限、Session、Migration 與 Admin 等資料表結構；不能據此認定它保存了 Blog 文章。
+
+### 尚未確認的事項與檢查限制
+
+- 尚未取得各資料表的資料筆數。
+- 尚未使用 SQLite 引擎執行查詢；目前檢查是針對檔案標頭與 schema 定義的唯讀辨識。
+- 沒有讀取文章標題、正文、帳號、密碼雜湊或其他資料列內容。
+- 目前結果只適用於 main 分支所追蹤的這份 SQLite 檔案，不能推論其他分支、外部 MySQL 或曾經使用過的遠端資料庫沒有文章資料。
+- 不能僅憑這份檔案的結構判斷它是測試資料庫、早期開發資料庫，或曾經有資料但後來被清空。
+
+在決定保留、備份、轉移或刪除資料庫前，仍應先確認資料來源與保存需求。不得在未確認前覆寫或刪除這份檔案。
 
 ## 7. 歷史部署設定
 
@@ -209,6 +236,6 @@ Herokubranch 保存了當年的部署相關檔案：
 
 - 本文件中的程式功能描述來自靜態程式碼檢視。
 - 尚未重新安裝依賴、執行 migrations、啟動 Django server 或重新部署。
-- SQLite 尚未讀取資料表或資料列；目前僅確認 Repository 中存在該檔案及其 Git tree 檔案大小。
+- SQLite 已確認為有效的 SQLite 3 檔案，並以唯讀方式辨識出 10 張 Django 內建資料表；未發現 `context_blog_posts`。尚未取得資料筆數，也未讀取任何資料列內容。
 - Notebook 的描述依現有程式碼與保存輸出，不代表已在目前環境重新執行。
 - Git commit 可以佐證提交時間與檔案變化，但不能完整還原作者當年的每一個操作意圖。
